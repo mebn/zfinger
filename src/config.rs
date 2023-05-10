@@ -13,6 +13,7 @@ pub struct Config {
     pub first: bool,
     pub close: bool,
     pub hide_users: bool,
+    pub all_users: bool,
 }
 
 pub fn handle_args(mut args: &[String]) -> Result<Config, ConfigErrors> {
@@ -32,7 +33,7 @@ pub fn handle_args(mut args: &[String]) -> Result<Config, ConfigErrors> {
     for arg in args {
         let chars = arg.as_bytes();
 
-        if arg.as_bytes()[0] == '-' as u8 {
+        if chars[0] == '-' as u8 {
             for &c in &chars[1..] {
                 let c = c as char;
 
@@ -42,6 +43,8 @@ pub fn handle_args(mut args: &[String]) -> Result<Config, ConfigErrors> {
                     config.close = true;
                 } else if c == 'h' {
                     config.hide_users = true;
+                } else if c == 'a' {
+                    config.all_users = true;
                 } else {
                     return Err(ConfigErrors::FlagNotFound);
                 }

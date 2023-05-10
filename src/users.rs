@@ -1,6 +1,7 @@
 use serde::Deserialize;
 use crate::config;
 
+#[derive(Clone)]
 #[derive(Debug)]
 #[allow(dead_code)]
 #[derive(Deserialize)]
@@ -35,16 +36,25 @@ pub async fn get_users(query: &str) -> Result<Vec<HodisUser>, UsersErrors> {
         return Err(UsersErrors::SearchTimeout);
     }).unwrap();
 
-    users = users.into_iter().filter(|u| u.year != 0).collect();
     // latest year first
     users.sort_unstable_by(|a, b| b.year.cmp(&a.year));
 
     Ok(users)
 }
 
-fn display_users(users: &Vec<HodisUser>) {
+fn hide_some_users(users: &[HodisUser]) -> &[HodisUser] {
     for (i, user) in users.iter().enumerate() {
-        println!("{i}) {}, {}, {}, {}", user.display_name, user.uid, user.year, user.tag);
+        if user.year == 0 {
+            return &users[..i];
+        }
+    }
+
+    users
+}
+
+fn display_users(users: &[HodisUser]) {
+    for (i, user) in users.iter().enumerate() {
+        println!("[{i}] {} ({}), {}", user.display_name, user.uid, user.year);
     }
 }
 
@@ -52,13 +62,19 @@ fn show_image(uid: &str) {
     open::that(format!("https://zfinger.datasektionen.se/user/{uid}/image")).unwrap();
 }
 
-pub fn select_users(config: &config::Config, users: &Vec<HodisUser>) {
+pub fn select_users(config: &config::Config, mut users: &[HodisUser]) {
+    if !config.all_users {
+        users = hide_some_users(users);
+    }
+
     if !config.hide_users {
         display_users(users);
     }
 
     if config.first {
-        show_image(&users[0].uid);
+        if !users.is_empty() {
+            show_image(&users[0].uid);
+        }
     }
 
     if config.close {
