@@ -12,7 +12,7 @@ pub struct Config {
     pub query: String,
     pub first: bool,
     pub close: bool,
-    pub hide_users: bool,
+    pub hide_result: bool,
     pub all_users: bool,
 }
 
@@ -33,27 +33,21 @@ pub fn handle_args(mut args: &[String]) -> Result<Config, ConfigErrors> {
     for arg in args {
         let chars = arg.as_bytes();
 
-        if chars[0] == '-' as u8 {
-            for &c in &chars[1..] {
-                let c = c as char;
-
-                if c == 'f' {
-                    config.first = true;
-                } else if c == 'c' {
-                    config.close = true;
-                } else if c == 'h' {
-                    config.hide_users = true;
-                } else if c == 'a' {
-                    config.all_users = true;
-                } else {
-                    return Err(ConfigErrors::FlagNotFound);
-                }
-            }
-
-            index += 1;
-        } else {
+        if chars[0] != '-' as u8 {
             break;
         }
+
+        for &c in &chars[1..] {
+            match c as char {
+                'f' => config.first = true,
+                'c' => config.close = true,
+                'h' => config.hide_result = true,
+                'a' => config.all_users = true,
+                _ => return Err(ConfigErrors::FlagNotFound)
+            }
+        }
+
+        index += 1;
     }
 
     config.query = args[index..].join(" ");

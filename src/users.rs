@@ -67,14 +67,16 @@ pub fn select_users(config: &config::Config, mut users: &[HodisUser]) {
         users = hide_some_users(users);
     }
 
-    if !config.hide_users {
-        display_users(users);
-    }
-
     if config.first {
         if !users.is_empty() {
             show_image(&users[0].uid);
         }
+    }
+
+    if !config.hide_result {
+        display_users(users);
+    } else {
+        return;
     }
 
     if config.close {

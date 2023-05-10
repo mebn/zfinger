@@ -5,12 +5,13 @@ const HOW_TO_USE: &str = "
 Usage: zfinger [options] query
 List all students at KTH and see a picture of some of them.
 The query should not have any quotes.
+Flags can be combined, e.g. zfinger -fch firstname lastname
 
-Flags can also be combined, e.g. zfinger -fch hello world
+Options:
     -f : Open the first result.
     -c : Close prompt, disable interactive loop.
-    -h : Hide results.
-    -a : Include all student, even those with no year set.
+    -h : Hide results and close prompt. Equivalent to -ch.
+    -a : Include all students, even those with no year set.
 ";
 
 #[tokio::main]
