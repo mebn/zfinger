@@ -1,8 +1,8 @@
 #[derive(Debug)]
 pub enum ConfigErrors {
-    TooFewArgs,
+    NoArgs,
     NoSearchQuery,
-    FlagNotFound,
+    FlagNotFound(char),
 }
 
 #[derive(Default)]
@@ -17,8 +17,8 @@ pub struct Config {
 }
 
 pub fn handle_args(mut args: &[String]) -> Result<Config, ConfigErrors> {
-    if args.len() < 2 {
-        return Err(ConfigErrors::TooFewArgs);
+    if args.len() == 1 {
+        return Err(ConfigErrors::NoArgs);
     }
 
     let mut config = Config {
@@ -43,7 +43,7 @@ pub fn handle_args(mut args: &[String]) -> Result<Config, ConfigErrors> {
                 'c' => config.close = true,
                 'h' => config.hide_result = true,
                 'a' => config.all_users = true,
-                _ => return Err(ConfigErrors::FlagNotFound)
+                _ => return Err(ConfigErrors::FlagNotFound(c as char))
             }
         }
 

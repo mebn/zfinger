@@ -18,15 +18,21 @@ Options:
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
 
-    let config = config::handle_args(&args).unwrap_or_else(|_err| {
-        println!("{HOW_TO_USE}");
+    let config = config::handle_args(&args).unwrap_or_else(|err| {
+        match err {
+            config::ConfigErrors::NoArgs => {},
+            config::ConfigErrors::FlagNotFound(c) => eprintln!("-{c} is not a valid flag"),
+            config::ConfigErrors::NoSearchQuery => eprintln!("No search query provided"),
+        }
+
+        eprintln!("{HOW_TO_USE}");
         std::process::exit(1);
     });
 
     let users = users::get_users(&config.query).await.unwrap_or_else(|err| {
         match err {
-            users::UsersErrors::URLNotFound => println!("Could not reach url"),
-            users::UsersErrors::SearchTimeout => println!("Search timeout, try again"),
+            users::UsersErrors::URLNotFound => eprintln!("Could not reach url"),
+            users::UsersErrors::SearchTimeout => eprintln!("Search timeout, try again"),
         }
 
         std::process::exit(1);
