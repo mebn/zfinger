@@ -26,19 +26,17 @@ pub enum UsersErrors {
 }
 
 pub async fn get_users(query: &str) -> Result<Vec<HodisUser>, UsersErrors> {
-    let url = format!("https://hodis.datasektionen.se/users/{}", query);
+    let url = format!("https://hodis.datasektionen.se/users/{query}");
 
-    let res = reqwest::get(url).await;
-    if res.is_err() {
-        return Err(UsersErrors::URLNotFound);
-    }
-    let res =res.unwrap();
+    let res = match reqwest::get(url).await {
+        Ok(res) => res,
+        Err(_) => return Err(UsersErrors::URLNotFound),
+    };
 
-    let users = res.json().await;
-    if users.is_err() {
-        return Err(UsersErrors::SearchTimeout);
-    }
-    let mut users: Vec<HodisUser> = users.unwrap();
+    let mut users: Vec<HodisUser> = match res.json().await {
+        Ok(users) => users,
+        Err(_) => return Err(UsersErrors::SearchTimeout),
+    };
 
     // latest year first
     users.sort_unstable_by(|a, b| b.year.cmp(&a.year));
