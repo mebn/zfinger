@@ -2,8 +2,9 @@
 A command line tool for KTH zfinger
 
 ## Installation
+### From git (easiest)
 ```
-cargo install --path .
+cargo install --git https://github.com/mebn/zfinger
 ```
 
 ## How to use
