@@ -91,23 +91,24 @@ pub fn select_users(config: &config::Config, mut users: &[HodisUser]) {
         println!("Enter number next to user, or q to quit the program: ");
 
         let mut user_input = String::new();
-        let stdin = std::io::stdin(); // We get `Stdin` here.
-        stdin.read_line(&mut user_input).unwrap();
-        user_input = user_input[..user_input.len() - 1].to_string();
+        std::io::stdin().read_line(&mut user_input).unwrap();
+        user_input.pop();
 
         if user_input == "q" {
             break;
         }
 
-        match user_input.parse::<usize>() {
-            Ok(num) => {
-                if let Some(user) = users.get(num) {
-                    open::that(format!("https://zfinger.datasektionen.se/user/{}/image", user.uid)).unwrap();
-                } else {
-                    println!("{num} out of range, try another number...");
-                }
+        let selected_num = match user_input.parse::<usize>() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+        match users.get(selected_num) {
+            Some(user) => {
+                let url = format!("https://zfinger.datasektionen.se/user/{}/image", user.uid);
+                open::that(url).unwrap();
             },
-            Err(_) => {}
+            None => println!("{selected_num} out of range, try another number"),
         }
     }
 }
