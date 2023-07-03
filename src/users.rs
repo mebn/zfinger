@@ -69,6 +69,11 @@ pub fn select_users(config: &config::Config, mut users: &[HodisUser]) {
         users = hide_some_users(users);
     }
 
+    if users.is_empty() {
+        println!("No students found.");
+        return;
+    }
+
     if config.first {
         if !users.is_empty() {
             show_image(&users[0].uid);
@@ -88,7 +93,7 @@ pub fn select_users(config: &config::Config, mut users: &[HodisUser]) {
     println!("");
 
     loop {
-        println!("Enter number next to user, or q to quit the program: ");
+        println!("Enter number next to student, or (q)uit the program:");
 
         let mut user_input = String::new();
         std::io::stdin().read_line(&mut user_input).unwrap();
